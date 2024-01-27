@@ -1,4 +1,4 @@
-module webapp
+module github.com/rusl222/webapp
 
 go 1.21
 

@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"webapp/model"
-	"webapp/server"
-	"webapp/view"
+	"github.com/rusl222/webapp/model"
+	"github.com/rusl222/webapp/server"
+	"github.com/rusl222/webapp/view"
 )
 
 var addr = flag.String("addr", ":8080", "http service address")
