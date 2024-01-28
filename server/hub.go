@@ -26,15 +26,19 @@ type Hub struct {
 
 	// Map Callbacks from model
 	callbacks map[string]func([]byte) []byte
+
+	// Channel for data transmitted
+	ch chan *[]byte
 }
 
-func NewHub() *Hub {
+func NewHub(ch chan *[]byte) *Hub {
 	return &Hub{
 		broadcast:  make(chan []byte),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
 		clients:    make(map[*Client]bool),
 		callbacks:  make(map[string]func([]byte) []byte),
+		ch:         ch,
 	}
 }
 
@@ -48,6 +52,9 @@ func (h *Hub) AddCallback(name string, cb func([]byte) []byte) {
 }
 
 func (h *Hub) Run() {
+
+	go h.transmit()
+
 	for {
 		select {
 		case client := <-h.register:
@@ -87,5 +94,29 @@ func (h *Hub) Run() {
 			}
 
 		}
+	}
+
+}
+
+func (h *Hub) transmit() {
+	var message2 []byte
+	var err error
+
+	for {
+		b := <-h.ch
+
+		mes := Message{
+			Action: "printLog",
+			Data:   fmt.Sprint(*b),
+		}
+
+		if message2, err = json.Marshal(&mes); err != nil {
+			continue
+		}
+
+		for client := range h.clients {
+			client.send <- message2
+		}
+
 	}
 }

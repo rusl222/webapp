@@ -15,8 +15,12 @@ var addr = flag.String("addr", ":8080", "http service address")
 
 func main() {
 
+	ch := make(chan *[]byte)
+	go model.NewTcpClient(ch)
+
 	flag.Parse()
-	hub := server.NewHub()
+
+	hub := server.NewHub(ch)
 
 	hub.AddCallback("printEcho", model.PrintEcho)
 
@@ -38,4 +42,5 @@ func main() {
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
+
 }
