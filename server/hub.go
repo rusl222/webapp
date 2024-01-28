@@ -7,6 +7,8 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+
+	"github.com/rusl222/webapp/model/modbus"
 )
 
 // Hub maintains the set of active clients and broadcasts messages to the
@@ -28,10 +30,10 @@ type Hub struct {
 	callbacks map[string]func([]byte) []byte
 
 	// Channel for data transmitted
-	ch chan *[]byte
+	ch chan modbus.ModbusData
 }
 
-func NewHub(ch chan *[]byte) *Hub {
+func NewHub(ch chan modbus.ModbusData) *Hub {
 	return &Hub{
 		broadcast:  make(chan []byte),
 		register:   make(chan *Client),
@@ -107,7 +109,7 @@ func (h *Hub) transmit() {
 
 		mes := Message{
 			Action: "printLog",
-			Data:   fmt.Sprint(*b),
+			Data:   fmt.Sprintf("{id:%d,data:%v}", b.Request, b.Data),
 		}
 
 		if message2, err = json.Marshal(&mes); err != nil {

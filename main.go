@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/rusl222/webapp/model"
+	"github.com/rusl222/webapp/model/modbus"
 	"github.com/rusl222/webapp/server"
 	"github.com/rusl222/webapp/view"
 )
@@ -15,8 +16,9 @@ var addr = flag.String("addr", ":8080", "http service address")
 
 func main() {
 
-	ch := make(chan *[]byte)
-	go model.NewTcpClient(ch)
+	ch := make(chan modbus.ModbusData)
+	mb := modbus.New(nil, ch)
+	mb.Run()
 
 	flag.Parse()
 
